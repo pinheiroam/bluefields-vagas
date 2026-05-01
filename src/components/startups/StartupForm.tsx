@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
+import { FormStatus } from "@/components/ui/form-status";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,19 +18,17 @@ import {
   STARTUP_PHASE_LABEL,
   type StartupPhase,
 } from "@/lib/constants/startup-phases";
-import {
-  createStartupAction,
-  updateStartupAction,
-} from "@/server/actions/startups";
 import type { ActionResult } from "@/server/actions/result";
 
-export const STARTUP_FORM_MODE = {
-  CREATE: "create",
-  EDIT: "edit",
-} as const;
+import {
+  STARTUP_FORM_MODE,
+  type StartupFormMode,
+} from "./startup-form-mode";
 
-export type StartupFormMode =
-  (typeof STARTUP_FORM_MODE)[keyof typeof STARTUP_FORM_MODE];
+type StartupFormAction = (
+  prev: ActionResult<{ id: string }> | null,
+  formData: FormData,
+) => Promise<ActionResult<{ id: string }>>;
 
 interface ResponsibleOption {
   id: string;
@@ -46,15 +45,19 @@ interface StartupFormProps {
     responsibleId?: string;
   };
   mode: StartupFormMode;
+  action: StartupFormAction;
 }
 
 const initialState: ActionResult<{ id: string }> | null = null;
 const PHASE_FIELD_NAME = "phase";
 const RESPONSIBLE_FIELD_NAME = "responsibleId";
 
-export function StartupForm({ responsibles, defaultValues, mode }: StartupFormProps) {
-  const action =
-    mode === STARTUP_FORM_MODE.CREATE ? createStartupAction : updateStartupAction;
+export function StartupForm({
+  responsibles,
+  defaultValues,
+  mode,
+  action,
+}: StartupFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const fieldErrors = state && !state.ok ? state.fieldErrors : undefined;
 
@@ -137,11 +140,7 @@ export function StartupForm({ responsibles, defaultValues, mode }: StartupFormPr
         </Select>
       </FormField>
 
-      {state && !state.ok && !state.fieldErrors ? (
-        <p className="text-sm text-destructive" role="alert">
-          {state.error}
-        </p>
-      ) : null}
+      <FormStatus state={state} />
 
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={isPending}>

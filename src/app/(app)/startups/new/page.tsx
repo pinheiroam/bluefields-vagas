@@ -1,10 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/PageHeader";
-import {
-  StartupForm,
-  STARTUP_FORM_MODE,
-} from "@/components/startups/StartupForm";
+import { StartupForm } from "@/components/startups/StartupForm";
+import { STARTUP_FORM_MODE } from "@/components/startups/startup-form-mode";
 import { getCurrentUser } from "@/lib/supabase/auth";
+import { createStartupAction } from "@/server/actions/startups";
 import { listProfiles } from "@/server/queries/startups";
 
 export default async function NewStartupPage() {
@@ -15,6 +14,11 @@ export default async function NewStartupPage() {
     id: profile.id,
     fullName: profile.full_name,
   }));
+
+  const defaultResponsibleId =
+    user?.id && responsibles.some((r) => r.id === user.id)
+      ? user.id
+      : undefined;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -27,8 +31,9 @@ export default async function NewStartupPage() {
         <CardContent className="pt-6">
           <StartupForm
             mode={STARTUP_FORM_MODE.CREATE}
+            action={createStartupAction}
             responsibles={responsibles}
-            defaultValues={{ responsibleId: user?.id }}
+            defaultValues={{ responsibleId: defaultResponsibleId }}
           />
         </CardContent>
       </Card>

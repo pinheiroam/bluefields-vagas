@@ -2,10 +2,9 @@ import { notFound } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/PageHeader";
-import {
-  StartupForm,
-  STARTUP_FORM_MODE,
-} from "@/components/startups/StartupForm";
+import { StartupForm } from "@/components/startups/StartupForm";
+import { STARTUP_FORM_MODE } from "@/components/startups/startup-form-mode";
+import { updateStartupAction } from "@/server/actions/startups";
 import { getStartup, listProfiles } from "@/server/queries/startups";
 
 interface EditStartupPageProps {
@@ -37,6 +36,7 @@ export default async function EditStartupPage({ params }: EditStartupPageProps) 
         <CardContent className="pt-6">
           <StartupForm
             mode={STARTUP_FORM_MODE.EDIT}
+            action={updateStartupAction}
             responsibles={responsibles}
             defaultValues={{
               id: startup.id,

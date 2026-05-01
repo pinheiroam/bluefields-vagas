@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
+import { FormStatus } from "@/components/ui/form-status";
 import { Input } from "@/components/ui/input";
 import { loginAction } from "@/server/actions/auth";
 import type { ActionResult } from "@/server/actions/result";
@@ -56,11 +57,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         />
       </FormField>
 
-      {state && !state.ok && !state.fieldErrors ? (
-        <p className="text-sm text-destructive" role="alert">
-          {state.error}
-        </p>
-      ) : null}
+      <FormStatus state={state} />
 
       <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Entrando..." : "Entrar"}
