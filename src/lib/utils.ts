@@ -9,6 +9,7 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
   year: "numeric",
+  timeZone: "UTC",
 });
 
 export function formatDate(value: string | Date | null | undefined): string {
@@ -25,7 +26,17 @@ export function formatRelativeDays(value: string | Date | null | undefined): str
   if (!value) return "—";
   const date = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return "—";
-  const diff = Math.round((date.getTime() - Date.now()) / MS_PER_DAY);
+  const todayUtc = Date.UTC(
+    new Date().getUTCFullYear(),
+    new Date().getUTCMonth(),
+    new Date().getUTCDate(),
+  );
+  const valueUtc = Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+  );
+  const diff = Math.round((valueUtc - todayUtc) / MS_PER_DAY);
   if (diff === 0) return "hoje";
   return RELATIVE_FORMATTER.format(diff, "day");
 }
@@ -39,7 +50,10 @@ export function getSearchParamString(
   return value ?? null;
 }
 
-// Retorna a data de hoje no formato ISO YYYY-MM-DD (compatível com <input type="date">).
 export function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
